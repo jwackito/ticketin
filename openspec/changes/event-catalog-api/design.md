@@ -175,6 +175,16 @@ Demo rows: two published upcoming events (`now + 7d`, `now + 14d`), one draft (`
 - `docker compose` in CI — rejected: image builds before tests roughly double feedback time.
 - Testcontainers — rejected: Docker-in-Docker complexity.
 
+### D13: Database driver
+
+**Decision:** Use `psycopg` (psycopg 3) via `psycopg[binary]`, replacing the bootstrap's `psycopg2-binary`.
+
+**Rationale:** SQLAlchemy 2.1 selects the `psycopg` driver for `postgresql://` URLs by default, so `psycopg2-binary` is never imported. Keeping it would require a `postgresql+psycopg2://` prefix in every environment. psycopg 3 is the supported path forward.
+
+**Alternatives considered:**
+- Keep `psycopg2-binary` and prefix every URL with `+psycopg2` — rejected: verbose and contrary to the framework default.
+- Pin SQLAlchemy `<2.1` — rejected: postpones the migration without benefit.
+
 ## Risks / Trade-offs
 
 - [Time-dependent tests can flake near midnight or on slow machines] → tests create events relative to `now` (`+1 day`, `-1 day`) rather than at exact boundaries; no clock mocking needed.

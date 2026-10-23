@@ -50,6 +50,44 @@ docker compose exec frontend npx tsc --noEmit
 docker compose exec frontend npx vitest run
 ```
 
+### Database Migrations
+
+Schema changes are managed with Alembic. `docker compose up` applies migrations
+automatically through the one-shot `migrate` service, before the backend starts.
+
+```bash
+# Apply migrations manually
+docker compose run --rm migrate
+
+# Create a new migration after changing a model
+docker compose exec backend alembic revision --autogenerate -m "describe change"
+```
+
+### Seed Data
+
+Load demo events (idempotent, safe to re-run):
+
+```bash
+docker compose exec backend python -m app.seed
+```
+
+### API
+
+The event catalog is versioned under `/api/v1`.
+
+```bash
+curl http://localhost:8000/health
+# {"status":"ok","database":"ok"}
+
+curl "http://localhost:8000/api/v1/events?limit=20&offset=0"
+# {"items":[...],"total":2,"limit":20,"offset":0}
+
+curl http://localhost:8000/api/v1/events/<id>
+# the event object, or 404 {"detail":"Event not found"}
+```
+
+Interactive docs are served at http://localhost:8000/docs.
+
 ## Development Workflow
 
 1. Create a feature branch from `main`
