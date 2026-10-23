@@ -77,12 +77,13 @@ Greenfield project. No existing code, no existing CI/CD, no existing conventions
 
 ### D6: Branch protection rules
 
-**Decision:** On `main`: require PR, require CI pass, require 1 approval, require up-to-date branch, no direct pushes, no force pushes.
+**Decision:** On `main`: require a pull request, require the `backend`, `frontend`, and `docker` status checks to pass, require the branch to be up to date, forbid direct pushes, and forbid force pushes. Admin bypass is disabled (`enforce_admins: true`) and required approvals are 0, because the repository has a single maintainer.
 
-**Rationale:** Enforces the workflow without being overly restrictive. 1 approval is sufficient for a 2-4 person team.
+**Rationale:** Enforcing a pull request with no approval gate keeps the workflow intact for a solo maintainer — the author can merge their own PR once CI is green — while `enforce_admins` removes the admin escape hatch that previously allowed direct pushes. If the team grows, raise the required approvals to 1.
 
 **Alternatives considered:**
-- 2 approvals — rejected: too slow for a small team
+- 1+ approvals — rejected for now: GitHub does not allow self-approval, so a solo maintainer could not merge.
+- Leaving `enforce_admins: false` — rejected: admins can silently bypass protection, which is how direct pushes occurred.
 - No branch protection — rejected: course requirement, and it's a good practice
 
 ### D7: Conventional Commits
@@ -187,6 +188,27 @@ Greenfield project. No existing code, no existing CI/CD, no existing conventions
 **Alternatives considered:**
 - Single massive PR — rejected: defeats code review, can't enforce branch protection meaningfully
 - Feature-complete bootstrap — rejected: scope creep, delays workflow validation
+
+### D13: Solo workflow guardrails
+
+**Decision:** Make the branch-and-pull-request workflow unbypassable and visible:
+
+- Set `enforce_admins: true` and 0 required approvals on `main`.
+- Add a repository `AGENTS.md` instructing agents never to commit or push to `main`.
+- Add a `.githooks/pre-push` hook that rejects pushes to `main`, enabled per clone with `git config core.hooksPath .githooks`.
+
+**Rationale:** Branch protection already existed but admins could bypass it; two commits were pushed directly to `main` (`d03adc8`, `1126960`) before enforcement. Server-side enforcement is the only reliable guard for a solo maintainer. The hook and `AGENTS.md` make the rule visible and catch mistakes before they reach GitHub.
+
+**Implications:**
+- After enforcement, all changes must go through a branch and PR; direct pushes to `main` are rejected for everyone, including the repository owner.
+- The two pre-enforcement direct commits remain in history as a documented exception; history is not rewritten.
+- `core.hooksPath` is local configuration and cannot be versioned; it is documented in `AGENTS.md` and the README.
+- The hook only runs on an executable filesystem; on a `noexec` mount git skips it, so server-side protection is the operative guard.
+
+**Alternatives considered:**
+- Rewriting `main` to re-land the direct commits via PR — rejected: risks diverging shared history for no functional gain.
+- Relying on the hook alone — rejected: `--no-verify` skips it and `noexec` mounts disable it; the server-side rule is authoritative.
+- GitHub rulesets — rejected: classic branch protection on a public repository already provides what is needed on the Free plan.
 
 ## Risks / Trade-offs
 

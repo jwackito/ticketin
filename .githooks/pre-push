@@ -1,0 +1,16 @@
+#!/bin/sh
+# Block direct pushes to main.
+# Server-side branch protection is the real gate; this is a local convenience.
+# Enable with: git config core.hooksPath .githooks
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+    case "$remote_ref" in
+        refs/heads/main)
+            echo "error: direct pushes to 'main' are blocked." >&2
+            echo "       create a branch, push it, and open a pull request." >&2
+            exit 1
+            ;;
+    esac
+done
+
+exit 0

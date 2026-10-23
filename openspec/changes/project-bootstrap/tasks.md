@@ -52,11 +52,14 @@
 
 ## 7. Branch Protection
 
-- [x] 7.1 Enable branch protection on `main` requiring PR before merging and verify direct push to main is rejected
-- [x] 7.2 Require CI status checks to pass before merging and verify merge is blocked when CI fails
-- [x] 7.3 Require 1 approval before merging and verify merge is blocked without approval
-- [x] 7.4 Require branch to be up to date before merging and verify merge is blocked when branch is behind main
-- [x] 7.5 Disable force pushes on main and verify force push is rejected
+- [x] 7.1 Enable branch protection on `main` requiring a PR before merging with `enforce_admins` enabled, and verify a direct push to `main` is rejected (see D13)
+- [x] 7.2 Require the `backend`, `frontend`, and `docker` status checks before merging and verify the protection config lists all three
+- [x] 7.3 Set required approvals to 0 (solo maintainer) so the author can self-merge a green PR, and verify `required_approving_review_count` is 0 in the protection config
+- [x] 7.4 Require the branch to be up to date before merging and verify `strict` is enabled in the protection config
+- [x] 7.5 Disable force pushes on `main` and verify a force push is rejected
+- [x] 7.6 Create `AGENTS.md` with the never-push-to-`main` rule and verify the file exists with that directive
+- [x] 7.7 Add `.githooks/pre-push` rejecting pushes to `main`, document `git config core.hooksPath .githooks` in the README, and verify the hook logic rejects a push to `main` (invoked with `sh`; the workspace `noexec` mount prevents git from executing it, so server-side protection is the operative guard)
+- [x] 7.8 Verify the pre-enforcement direct commits (`d03adc8`, `1126960`) are recorded as a documented exception in design D13 and that history is not rewritten
 
 ## 8. Conventions and Templates
 
