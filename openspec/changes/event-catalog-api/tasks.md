@@ -41,7 +41,7 @@
 ## 6. CI
 
 - [x] 6.1 Add the health-checked PostgreSQL service, `DATABASE_URL`/`TEST_DATABASE_URL`, and an `alembic upgrade head` step to the backend job in `.github/workflows/ci.yml`, and verify the YAML parses and the same commands pass locally.
-- [ ] 6.2 Push a branch and open a pull request, then verify the backend job runs migrations and tests against PostgreSQL and all required checks pass.
+- [x] 6.2 Push a branch and open a pull request, then verify the backend job runs migrations and tests against PostgreSQL and all required checks pass.
 
 ## 7. Integration verification
 
