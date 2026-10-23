@@ -1,18 +1,39 @@
 services:
-  backend:
+  migrate:
     build: ./backend
-    ports:
-      - "8000:8000"
+    command: alembic upgrade head
     environment:
-      - DATABASE_URL=postgresql://ticketin:ticketin@db:5432/ticketin
+      DATABASE_URL: ${DATABASE_URL:-postgresql://ticketin:ticketin@db:5432/ticketin}
     depends_on:
       db:
         condition: service_healthy
     volumes:
       - ./backend:/app
       - /app/.venv
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://ticketin:ticketin@db:5432/ticketin}
+      TEST_DATABASE_URL: ${TEST_DATABASE_URL:-postgresql://ticketin:ticketin@db:5432/ticketin_test}
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    volumes:
+      - ./backend:/app
+      - /app/.venv
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
