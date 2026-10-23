@@ -13,7 +13,7 @@ The project needs a clean, professional development workflow from day one. As a 
 - GitHub Actions CI pipeline: lint, typecheck, test, and Docker build verification on every push and PR
 - GitHub Actions deploy workflow: frontend builds and deploys to GitHub Pages on merge to main
 - Branch protection on `main`: require PR, CI pass, 1 approval, up-to-date branch, no direct pushes
-- Conventional Commits convention (`feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`)
+- Conventional Commits convention (`feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`, `style:`, `perf:`, `ci:`, `build:`)
 - PR template with description, testing, and screenshot sections
 - Pre-commit hooks (ruff for backend, eslint for frontend) — run via `docker compose exec`
 - Spec-driven development workflow using OpenSpec (proposal -> design -> specs -> tasks -> implement)

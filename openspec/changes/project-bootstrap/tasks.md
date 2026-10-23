@@ -62,11 +62,11 @@
 
 - [x] 8.1 Create `.github/PULL_REQUEST_TEMPLATE.md` with description, testing, and screenshot sections and verify template appears when opening a PR
 - [x] 8.2 Document Conventional Commits format in README and verify commit messages follow the convention
-- [x] 8.3 Create `.pre-commit-config.yaml` with ruff and eslint hooks and verify hooks run via `docker compose exec` (no local pre-commit install)
+- [x] 8.3 Define pre-commit lint checks as `docker compose exec backend ruff check .` and `docker compose exec frontend npm run lint` and verify both run in the containers (no local install)
 - [x] 8.4 Document pre-commit hook workflow in README (run via `docker compose exec`, CI is the enforcement gate) and verify documentation is clear
 
 ## 9. Spec-Driven Development Setup
 
 - [x] 9.1 Verify OpenSpec CLI is installed and `openspec list --json` works
 - [x] 9.2 Document spec-driven development workflow in README (proposal -> design -> specs -> tasks -> implement) and verify documentation is clear
-- [x] 9.3 Create an example OpenSpec change to verify the workflow functions end-to-end and verify change is created successfully
+- [x] 9.3 Create the `project-bootstrap` OpenSpec change to verify the workflow functions end-to-end (specs skipped — no spec-level behavior) and verify the change is created successfully

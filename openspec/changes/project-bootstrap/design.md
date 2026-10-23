@@ -97,12 +97,12 @@ Greenfield project. No existing code, no existing CI/CD, no existing conventions
 
 ### D8: Pre-commit hooks
 
-**Decision:** Use `pre-commit` framework with ruff (backend) and eslint (frontend) hooks. Run via `docker compose exec` — no local pre-commit install.
+**Decision:** Run the existing container linters as pre-commit checks via `docker compose exec` — `ruff check .` in the backend container and `npm run lint` in the frontend container. No `pre-commit` framework and no local install.
 
-**Rationale:** Catches lint issues before CI, faster feedback, teaches good habits. Running via docker aligns with the Docker-only workflow (D10).
+**Rationale:** Catches lint issues before CI using tools already installed in the images, faster feedback, teaches good habits. Reusing the container linters avoids adding a hook runner and Node to the Python image, and aligns with the Docker-only workflow (D10). Because `.git` is not mounted into the containers, hooks cannot be installed as git hooks; they are run manually before committing, with CI as the enforcement gate.
 
 **Alternatives considered:**
-- No pre-commit hooks — rejected: CI-only feedback is slower
+- `pre-commit` framework — rejected: needs its own install, the eslint hook needs Node in the Python image, and it cannot install host git hooks from a container
 - Husky (JS-focused) — rejected: backend is Python, need a language-agnostic solution
 - Local pre-commit install — rejected: violates Docker-only workflow (D10)
 
@@ -111,6 +111,8 @@ Greenfield project. No existing code, no existing CI/CD, no existing conventions
 **Decision:** Use OpenSpec workflow for feature development: proposal -> design -> specs -> tasks -> implement.
 
 **Rationale:** Course requirement, teaches spec-first thinking, integrates with the project's OpenSpec setup.
+
+**Note:** This bootstrap sets `skip_specs` because it introduces no spec-level behavior; the `specs` step applies to feature changes that add or modify capabilities.
 
 **Alternatives considered:**
 - Ad-hoc development — rejected: course requirement
@@ -168,7 +170,7 @@ Greenfield project. No existing code, no existing CI/CD, no existing conventions
 **Rationale:**
 - Each PR is small and reviewable
 - The bootstrap demonstrates the workflow it sets up (eats its own dog food)
-- Branch protection and conventions are enforced incrementally, not bypassed
+- CI (phase 5) and branch protection (phase 7) gate changes from the phase that introduces them; earlier phases land via PR review before those gates exist
 - Easier to identify and fix issues early
 
 **Implementation order:**
@@ -178,7 +180,9 @@ Greenfield project. No existing code, no existing CI/CD, no existing conventions
 4. Docker Compose (orchestration + volumes)
 5. CI pipeline (GitHub Actions)
 6. Deploy pipeline (GitHub Pages)
-7. Branch protection + conventions
+7. Branch protection
+8. Conventions and templates (PR template, Conventional Commits, pre-commit lint checks)
+9. Spec-driven development setup (OpenSpec workflow)
 
 **Alternatives considered:**
 - Single massive PR — rejected: defeats code review, can't enforce branch protection meaningfully
