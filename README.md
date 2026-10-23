@@ -113,6 +113,53 @@ git config core.hooksPath .githooks
 The hook is a convenience only; the server-side protection is the real gate. It requires an
 executable filesystem — on a `noexec` mount git skips it.
 
+### Commit Convention
+
+Commits follow [Conventional Commits](https://www.conventionalcommits.org/). Allowed types:
+
+| Type | Use for |
+|---|---|
+| `feat` | a new feature |
+| `fix` | a bug fix |
+| `docs` | documentation only |
+| `test` | adding or fixing tests |
+| `refactor` | a change that neither fixes a bug nor adds a feature |
+| `style` | formatting only |
+| `perf` | a performance improvement |
+| `ci` | CI configuration |
+| `build` | build system or dependencies |
+| `chore` | other changes that do not touch source or tests |
+
+Example: `feat: add read-only event catalog API`
+
+### Pre-commit Lint Checks
+
+There is no pre-commit framework and nothing is installed on the host. Run the
+container linters before committing:
+
+```bash
+docker compose exec backend ruff check .
+docker compose exec frontend npm run lint
+```
+
+CI runs the same checks plus type checking and tests, and it is the enforcement
+gate, so a skipped local check is caught on the pull request.
+
+### Spec-Driven Development
+
+Features are developed with OpenSpec in `openspec/`, following
+proposal -> design -> specs -> tasks -> implement.
+
+```bash
+openspec list                      # list active changes
+openspec show <change>             # read a change
+openspec validate <change> --strict
+openspec archive <change>          # after implementation and review
+```
+
+Create a new change with `openspec new change "<name>"` and capture its artifacts
+before writing code. Changes live in `openspec/changes/` until archived.
+
 ## Project Structure
 
 ```
