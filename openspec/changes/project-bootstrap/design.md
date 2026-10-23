@@ -71,6 +71,10 @@ Greenfield project. No existing code, no existing CI/CD, no existing conventions
 
 **Rationale:** GitHub Pages is free, integrated with GitHub, and sufficient for a static React frontend. No backend deployment needed.
 
+**Implications:**
+- Production builds set Vite `base` to `/ticketin/` because GitHub Pages serves a project site under the repository path; the dev server stays at `/`.
+- The repository's Pages source must be **GitHub Actions** (`build_type: workflow`). The legacy "deploy from a branch" builder is not used and must stay disabled.
+
 **Alternatives considered:**
 - Manual build and push to `gh-pages` branch — rejected: error-prone, not automated
 - Netlify/Vercel — rejected: external service, unnecessary for a course project
